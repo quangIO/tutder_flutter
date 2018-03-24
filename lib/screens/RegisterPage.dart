@@ -70,7 +70,7 @@ class _RegisterPageState extends State<RegisterPage> {
         } else {
           debugPrint('Navigate to Home');
           Navigator.pop(context);
-          Navigator.pushReplacementNamed(context, '/home');
+          Navigator.pushReplacementNamed(context, '/profile');
         }
         break;
       default:

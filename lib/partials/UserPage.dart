@@ -11,7 +11,7 @@ class UserPage extends StatelessWidget {
     @required this.pageVisibility,
   });
 
-  final User user;
+  final Map user;
   final PageVisibility pageVisibility;
 
   Widget _applyTextEffects({
@@ -35,7 +35,7 @@ class UserPage extends StatelessWidget {
     final categoryText = _applyTextEffects(
       translationFactor: 300.0,
       child: new Text(
-        user.intro,
+        user['intro'],
         style: textTheme.caption.copyWith(
           color: Colors.white70,
           fontWeight: FontWeight.bold,
@@ -51,7 +51,7 @@ class UserPage extends StatelessWidget {
       child: new Padding(
         padding: const EdgeInsets.only(top: 16.0),
         child: new Text(
-          user.username,
+          user['username'],
           style: textTheme.title
               .copyWith(color: Colors.white, fontWeight: FontWeight.bold),
           textAlign: TextAlign.center,
@@ -77,7 +77,7 @@ class UserPage extends StatelessWidget {
   Widget build(BuildContext context) {
     // ignore: conflicting_dart_import
     final image = new Image.network(
-      user.imageUrl,
+      user['imageUrl'],
       fit: BoxFit.cover,
       alignment:
           new FractionalOffset(0.5 + (pageVisibility.pagePosition / 3), 0.5),

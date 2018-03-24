@@ -1,3 +1,4 @@
+import '../screens/UserProfileSettingScreen.dart';
 import '../screens/UserFeedScreen.dart';
 import '../screens/LoginPage.dart';
 import '../screens/RegisterPage.dart';
@@ -14,11 +15,14 @@ class BaseRouterHandler {
       handlerFunc: (_, Map<String, dynamic> params) => new UserFeedScreen());
   final _registerHandler = new Handler(
       handlerFunc: (_, Map<String, dynamic> params) => new RegisterPage());
+  final _profileHandler = new Handler(
+      handlerFunc: (_, Map<String, dynamic> params) => new UserProfileSettingScreen());
 
   BaseRouterHandler() {
     router.define("/login", handler: _loginHandler);
     router.define("/home", handler: _homeHandler);
     router.define("/register", handler: _registerHandler);
+    router.define("/profile", handler: _profileHandler);
   }
   BaseRouterHandler._internal();
 }

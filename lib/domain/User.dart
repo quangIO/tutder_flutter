@@ -4,5 +4,14 @@ class User {
   final String intro;
   final String session;
 
-  User(this.username, {this.imageUrl = 'http://d3iw72m71ie81c.cloudfront.net/female-44.jpg', this.intro = '', this.session});
+  int loved;
+
+  User(this.username, {
+    this.imageUrl = 'http://d3iw72m71ie81c.cloudfront.net/female-44.jpg',
+    this.intro = '',
+    this.session,
+    this.loved = 0,
+  });
+
+  // static User fromMap(Map<String, dynamic> m) =>User(m['username'], )
 }

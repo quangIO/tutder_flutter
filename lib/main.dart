@@ -18,9 +18,9 @@ class MyApp extends StatelessWidget {
         primarySwatch: Colors.blue,
       ),
       onGenerateRoute: router.generator,
-      //home: new LoginPage(),
+      home: new LoginPage(),
       //home: UserFeedScreen()
-      home: new UserProfileSettingScreen(),
+      //home: new UserProfileSettingScreen(),
     );
   }
 }

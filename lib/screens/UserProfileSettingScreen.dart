@@ -1,8 +1,17 @@
+import 'dart:convert';
+
+import 'package:collection/collection.dart';
 import 'package:flutter/material.dart';
+import 'package:tutder/config/HttpConfig.dart';
 import 'package:tutder/config/ThemeConfig.dart';
+import 'package:tutder/domain/Skill.dart';
+import 'package:tutder/domain/User.dart';
 import 'package:tutder/partials/BottomWaveClipper.dart';
+import 'package:tutder/screens/drawer/DefaultDrawer.dart';
+import 'package:tutder/util/Login.dart';
 import 'dart:math';
 
+import 'package:http/http.dart' as http;
 import 'package:tutder/util/MediaUtils.dart';
 
 class UserProfileSettingScreen extends StatefulWidget {
@@ -11,17 +20,21 @@ class UserProfileSettingScreen extends StatefulWidget {
 }
 
 class _UserProfileSettingState extends State<UserProfileSettingScreen> {
-  TextEditingController infoTextController;
-  TextEditingController descriptionTextController;
-  final List<String> strengths = [
-    "Computer Science",
-    "Nah",
-    "Computer Science",
-    "Nah"
+  TextEditingController infoTextController = new TextEditingController();
+  TextEditingController descriptionTextController = new TextEditingController();
+  final List<Skill> skills = [
+    Skill("Sleeping"),
+    Skill("Deep Sleeping"),
+    Skill("STEM"),
+    Skill("Hackathon"),
+    Skill("Everything else", "WEAK")
   ];
-  final List<String> weaknesses = ["Everything else"];
+  User me;
+  String url;
 
-  _initInfo() async {}
+  _initInfo() async {
+    me = await Login.getUserInfo();
+  }
 
   @override
   void initState() {
@@ -34,21 +47,21 @@ class _UserProfileSettingState extends State<UserProfileSettingScreen> {
       child: new Container(
         child: new Center(
           child: Stack(
-            alignment: AlignmentDirectional.bottomStart,
+            alignment: AlignmentDirectional.bottomEnd,
             children: <Widget>[
               new CircleAvatar(
-                backgroundImage: new NetworkImage(
+                backgroundImage: new NetworkImage(url ??
                     'https://api.adorable.io/avatars/285/' +
                         Random.secure().nextInt(1000).toString()),
                 radius: 85.0,
               ),
               new IconButton(
-                icon: new Icon(Icons.add),
+                icon: new Icon(Icons.edit),
                 color: new Color.fromARGB(144, 12, 23, 33),
                 onPressed: () {
-                  MediaUtils.upload('?avatar=1');
+                  MediaUtils.upload('?avatar=1').then((u) => setState(() => url = u));
                 },
-                iconSize: 88.0,
+                iconSize: 38.0,
               )
             ],
           ),
@@ -67,10 +80,39 @@ class _UserProfileSettingState extends State<UserProfileSettingScreen> {
     );
   }
 
+  addSkill(Skill skill) {
+    http.post(
+      API.SKILL_URL_CREATE,
+      headers: new CombinedMapView([
+        {'cookie': me.session},
+        API.DEFAULT_HEADER
+      ]),
+      body: json.encode(skill.toMap()),
+    );
+    setState(() => skills.remove(skill));
+  }
+
+  updateUser() {
+    http.post(
+      API.USER_UPDATE_URL,
+      headers: new CombinedMapView([
+        {'cookie': me.session},
+        API.DEFAULT_HEADER
+      ]),
+      body: json.encode({
+        'description': descriptionTextController.text,
+        'info': infoTextController.text,
+      }),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
+    final strengths = skills.where((skill) => skill.level == "STRONG").toList();
+    final weaknesses = skills.where((skill) => skill.level == "WEAK").toList();
     return new Scaffold(
       backgroundColor: Colors.grey.shade900,
+      drawer: new DefaultDrawer(),
       body: new Column(
         children: <Widget>[
           _buildAvatar(),
@@ -121,9 +163,9 @@ class _UserProfileSettingState extends State<UserProfileSettingScreen> {
             child: new ListView.builder(
               itemBuilder: (BuildContext context, int index) {
                 return new FlatButton(
-                  onPressed: () {},
+                  onPressed: () => addSkill(strengths[index]),
                   child: new Text(
-                    strengths[index],
+                    strengths[index].name,
                     style: TextStyles.infoContent,
                   ),
                 );
@@ -147,9 +189,11 @@ class _UserProfileSettingState extends State<UserProfileSettingScreen> {
             child: new ListView.builder(
               itemBuilder: (BuildContext context, int index) {
                 return new FlatButton(
-                  onPressed: () {},
+                  onPressed: () {
+                    addSkill(weaknesses[index]);
+                  },
                   child: new Text(
-                    weaknesses[index],
+                    weaknesses[index].name,
                     style: TextStyles.infoContent,
                   ),
                 );
@@ -168,7 +212,10 @@ class _UserProfileSettingState extends State<UserProfileSettingScreen> {
         ],
       ),
       floatingActionButton: new FloatingActionButton(
-        onPressed: () {},
+        onPressed: () {
+          updateUser();
+          Navigator.pushReplacementNamed(context, '/home');
+        },
         child: new Icon(Icons.arrow_right),
       ),
     );

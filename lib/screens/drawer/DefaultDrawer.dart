@@ -14,23 +14,9 @@ class DefaultDrawer extends StatelessWidget {
         children: <Widget>[
           new ListTile(
             leading: const Icon(Icons.person),
-            title: const Text('My profile'),
+            title: const Text('Edit my profile'),
             onTap: () {
-              Login.getUserInfo().then((u){
-                Navigator.pushNamed(context, '/user/${u.username}');
-              });
-            },
-          ),
-          new ListTile(
-            leading: const Icon(Icons.my_location),
-            title: const Text('Refresh location'),
-            onTap: updateLocation,
-          ),
-          new ListTile(
-            leading: const Icon(Icons.map),
-            title: const Text('Places near me'),
-            onTap: () {
-              Navigator.pushNamed(context, '/places');
+              Navigator.pushNamed(context, 'profile');
             },
           ),
           new Divider(),
