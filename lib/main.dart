@@ -1,7 +1,12 @@
 import 'package:flutter/material.dart';
-import 'package:tutder/screens/UserFeedScreen.dart';
+import 'package:tutder/config/RouteSingleton.dart';
+import 'package:tutder/screens/LoginPage.dart';
+import 'package:tutder/screens/UserProfileSettingScreen.dart';
 
-void main() => runApp(new MyApp());
+void main() {
+  new BaseRouterHandler();
+  runApp(new MyApp());
+}
 
 class MyApp extends StatelessWidget {
   // This widget is the root of your application.
@@ -12,8 +17,10 @@ class MyApp extends StatelessWidget {
       theme: new ThemeData(
         primarySwatch: Colors.blue,
       ),
-      // home: new MyHomePage(title: 'Flutter Demo Home Page'),
-      home: UserFeedScreen()
+      onGenerateRoute: router.generator,
+      //home: new LoginPage(),
+      //home: UserFeedScreen()
+      home: new UserProfileSettingScreen(),
     );
   }
 }
