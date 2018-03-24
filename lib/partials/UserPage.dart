@@ -35,7 +35,7 @@ class UserPage extends StatelessWidget {
     final categoryText = _applyTextEffects(
       translationFactor: 300.0,
       child: new Text(
-        user['intro'],
+        user['info'],
         style: textTheme.caption.copyWith(
           color: Colors.white70,
           fontWeight: FontWeight.bold,
@@ -94,7 +94,7 @@ class UserPage extends StatelessWidget {
     );
 
     final frostedGlassFilter = new BackdropFilter(
-      filter: new ImageFilter.blur(sigmaX: 10.0, sigmaY: 10.0),
+      filter: new ImageFilter.blur(sigmaX: 20.0, sigmaY: 20.0),
       child: new Container(
         decoration: new BoxDecoration(color: Colors.grey[200].withOpacity(0.1)),
       ),
