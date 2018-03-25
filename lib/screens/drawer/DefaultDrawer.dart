@@ -16,7 +16,21 @@ class DefaultDrawer extends StatelessWidget {
             leading: const Icon(Icons.person),
             title: const Text('Edit my profile'),
             onTap: () {
-              Navigator.pushNamed(context, 'profile');
+              Navigator.pushNamed(context, '/profile');
+            },
+          ),
+          new ListTile(
+            leading: const Icon(Icons.subject),
+            title: const Text('Requests'),
+            onTap: () {
+              Navigator.pushNamed(context, '/request');
+            },
+          ),
+          new ListTile(
+            leading: const Icon(Icons.send),
+            title: const Text('Requests'),
+            onTap: () {
+              Navigator.pushNamed(context, '/sent');
             },
           ),
           new Divider(),

@@ -171,7 +171,7 @@ class _MessagingState extends State<MessagingScreen> {
               controller: placeTextController,
               autofocus: false,
               decoration: new InputDecoration(
-                  hintText: "Place to meet",
+                  hintText: "Where/When to meet?",
                   hintStyle: TextStyles.regularWhite
                       .copyWith(color: Colors.white.withOpacity(.4))),
             ),

@@ -1,4 +1,5 @@
 import 'package:tutder/screens/MessagingScreen.dart';
+import 'package:tutder/screens/RecievedScreen.dart';
 
 import '../screens/UserProfileSettingScreen.dart';
 import '../screens/UserFeedScreen.dart';
@@ -24,12 +25,17 @@ class BaseRouterHandler {
       handlerFunc: (_, Map<String, dynamic> params) {
         return new MessagingScreen(params['username'].toString().replaceFirst("[", "").replaceFirst("]", ""));
       });
+  final _requestHandler = new Handler(
+      handlerFunc: (_, Map<String, dynamic> params) => new RecievedScreen());
+  final _sendHandler = new Handler(
+      handlerFunc: (_, Map<String, dynamic> params) => new UserProfileSettingScreen());
 
   BaseRouterHandler() {
     router.define("/login", handler: _loginHandler);
     router.define("/home", handler: _homeHandler);
     router.define("/register", handler: _registerHandler);
     router.define("/profile", handler: _profileHandler);
+    router.define("/request", handler: _requestHandler);
     router.define("/message/:username", handler: _messagingHandler);
   }
   BaseRouterHandler._internal();
