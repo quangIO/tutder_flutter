@@ -181,6 +181,9 @@ class _UserPageState extends State<UserPage> {
                   // debugPrint("/message/${widget.user['username']}");
                   router.navigateTo(context, "/message/${widget.user['username']}", transition: TransitionType.inFromBottom);
                 },
+                onDoubleTap: () {
+                  router.navigateTo(context, "/message/${widget.user['username']}", transition: TransitionType.inFromBottom);
+                },
               )
             ],
           ),

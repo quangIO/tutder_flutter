@@ -22,18 +22,26 @@ class UserProfileSettingScreen extends StatefulWidget {
 class _UserProfileSettingState extends State<UserProfileSettingScreen> {
   TextEditingController infoTextController = new TextEditingController();
   TextEditingController descriptionTextController = new TextEditingController();
-  final List<Skill> skills = [
-    Skill("Sleeping"),
-    Skill("Deep Sleeping"),
-    Skill("STEM"),
-    Skill("Hackathon"),
-    Skill("Everything else", "WEAK")
-  ];
+  List skills = [];
   User me;
   String url;
 
   _initInfo() async {
     me = await Login.getUserInfo();
+    http.Response response = await http.get(
+      API.BASE_URL + '/secured/skill/list',
+      headers: new CombinedMapView([
+        {'cookie': me.session},
+        API.DEFAULT_HEADER
+      ]),
+    );
+    if(!mounted) return;
+    Map<String, dynamic> body = json.decode(response.body);
+    if (body['code']['value'] == 200) {
+      setState(() {
+        skills = body['content'];
+      });
+    } else {}
   }
 
   @override
@@ -80,14 +88,16 @@ class _UserProfileSettingState extends State<UserProfileSettingScreen> {
     );
   }
 
-  addSkill(Skill skill) {
+  addSkill(Map skill, [String level = "STRONG"]) {
+    Map tmp = skill;
+    tmp['level'] = level;
     http.post(
       API.SKILL_URL_CREATE,
       headers: new CombinedMapView([
         {'cookie': me.session},
         API.DEFAULT_HEADER
       ]),
-      body: json.encode(skill.toMap()),
+      body: json.encode(skill),
     );
     setState(() => skills.remove(skill));
   }
@@ -108,8 +118,6 @@ class _UserProfileSettingState extends State<UserProfileSettingScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final strengths = skills.where((skill) => skill.level == "STRONG").toList();
-    final weaknesses = skills.where((skill) => skill.level == "WEAK").toList();
     return new Scaffold(
       backgroundColor: Colors.grey.shade900,
       drawer: new DefaultDrawer(),
@@ -154,7 +162,7 @@ class _UserProfileSettingState extends State<UserProfileSettingScreen> {
           ),
           new Center(
             child: new Text(
-              "I AM GOOD AT",
+              "CLEAR YOUR STRENGTHS",
               style: TextStyles.regularWhite.copyWith(color: Colors.green),
             ),
           ),
@@ -163,15 +171,15 @@ class _UserProfileSettingState extends State<UserProfileSettingScreen> {
             child: new ListView.builder(
               itemBuilder: (BuildContext context, int index) {
                 return new FlatButton(
-                  onPressed: () => addSkill(strengths[index]),
+                  onPressed: () => addSkill(skills[index]),
                   child: new Text(
-                    strengths[index].name,
+                    skills[index]['name'],
                     style: TextStyles.infoContent,
                   ),
                 );
               },
               scrollDirection: Axis.horizontal,
-              itemCount: strengths.length,
+              itemCount: skills.length,
             ),
           ),
           new Divider(
@@ -180,7 +188,7 @@ class _UserProfileSettingState extends State<UserProfileSettingScreen> {
           ),
           new Center(
             child: new Text(
-              "I AM BAD AT",
+              "CLEAR YOUR WEAKNESSES",
               style: TextStyles.regularWhite.copyWith(color: Colors.red),
             ),
           ),
@@ -190,16 +198,16 @@ class _UserProfileSettingState extends State<UserProfileSettingScreen> {
               itemBuilder: (BuildContext context, int index) {
                 return new FlatButton(
                   onPressed: () {
-                    addSkill(weaknesses[index]);
+                    addSkill(skills[index], "WEAK");
                   },
                   child: new Text(
-                    weaknesses[index].name,
+                    skills[index]['name'],
                     style: TextStyles.infoContent,
                   ),
                 );
               },
               scrollDirection: Axis.horizontal,
-              itemCount: weaknesses.length,
+              itemCount: skills.length,
             ),
           ),
           /*

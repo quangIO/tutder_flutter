@@ -10,6 +10,7 @@ class MessageItem extends StatelessWidget {
   final bool isAccepted;
   final int idx;
 
+
   @override
   Widget build(BuildContext context) {
     return new Container(

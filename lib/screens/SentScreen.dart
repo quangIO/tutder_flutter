@@ -1,4 +1,3 @@
-import 'dart:async';
 import 'dart:convert';
 
 import 'package:collection/collection.dart';
@@ -8,6 +7,7 @@ import 'package:tutder/config/ThemeConfig.dart';
 import 'package:tutder/domain/User.dart';
 import 'package:tutder/partials/MessageItem.dart';
 import 'package:tutder/partials/WavyCard.dart';
+import 'package:tutder/screens/drawer/DefaultDrawer.dart';
 import 'package:tutder/util/Login.dart';
 import 'package:http/http.dart' as http;
 
@@ -22,6 +22,7 @@ class _SentState extends State<SentScreen> {
 
   _load() async {
     if(!mounted) return;
+    items.clear();
     me = await Login.getUserInfo();
     http.Response response = await http.get(
       API.BASE_URL + "/secured/message/sent",
@@ -42,9 +43,6 @@ class _SentState extends State<SentScreen> {
         }
       });
     } else {}
-    new Future.delayed(const Duration(seconds: 3), () {
-      _load();
-    });
   }
 
   @override
@@ -75,6 +73,7 @@ class _SentState extends State<SentScreen> {
   Widget build(BuildContext context) {
     return new Scaffold(
       backgroundColor: Colors.grey.shade900,
+      drawer: new DefaultDrawer(refresh: _load,),
       body: new CustomScrollView(
         slivers: <Widget>[
           new SliverAppBar(

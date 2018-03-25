@@ -39,6 +39,7 @@ class _MessagingState extends State<MessagingScreen> {
     )
         .then(
       (response) {
+        if(!mounted) return;
         Map<String, dynamic> body = json.decode(response.body);
         if (body['code']['value'] == 200) {
           setState(() => user = body['content']);
@@ -56,6 +57,7 @@ class _MessagingState extends State<MessagingScreen> {
         API.DEFAULT_HEADER
       ]),
     );
+    if(!mounted) return;
     Map<String, dynamic> body = json.decode(response.body);
     if (body['code']['value'] == 200) {
       setState(() {
@@ -99,7 +101,6 @@ class _MessagingState extends State<MessagingScreen> {
   }
 
   _send() async {
-    debugPrint("OK");
     http.Response response = await http.post(
       API.BASE_URL + '/secured/message/create',
       headers: new CombinedMapView([
@@ -116,11 +117,13 @@ class _MessagingState extends State<MessagingScreen> {
     if (body['code']['value'] == 200) {
       Navigator.pop(context);
     } else {
+      /*
       showBottomSheet(
           context: context,
           builder: (builder) {
             return new Text("Error");
           });
+          */
     }
     //questionTextController.clear();
     //placeTextController.clear();
@@ -242,6 +245,7 @@ class _MessagingState extends State<MessagingScreen> {
           _send();
         },
         child: new Icon(Icons.message),
+        heroTag: widget.username,
       ),
     );
   }
