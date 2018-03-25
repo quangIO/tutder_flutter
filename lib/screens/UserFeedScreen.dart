@@ -28,6 +28,24 @@ class _UserFeedState extends State<UserFeedScreen> {
 
   User me;
 
+  _propagate(int idx, int likeCount) {
+    http.get(
+      API.USER_LIST_URL + users[idx]['username'],
+      headers: new CombinedMapView([
+        {'cookie': me.session},
+        API.DEFAULT_HEADER
+      ]),
+    ).then((response){
+      Map<String, dynamic> body = json.decode(response.body);
+      if (body['code']['value'] == 200) {
+        setState(() => users[idx] = body['content']);
+      } else {
+      }
+    });
+
+    //users[idx]['extra']['is_loved'] = true;
+  }
+
   _getUsers() async {
     me = await Login.getUserInfo();
     http.Response response = await http.get(
@@ -75,6 +93,8 @@ class _UserFeedState extends State<UserFeedScreen> {
                       user: item,
                       pageVisibility: pageVisibility,
                       me: me,
+                      propagate: _propagate,
+                      idx: index,
                     );
                   },
                 );

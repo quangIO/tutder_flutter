@@ -1,29 +1,47 @@
+import 'dart:convert';
 import 'dart:ui';
 
 import 'package:collection/collection.dart';
+import 'package:fluro/fluro.dart';
 import 'package:flutter/material.dart';
 import 'package:meta/meta.dart';
 import 'package:tutder/components/PageTransformer.dart';
 import 'package:tutder/config/HttpConfig.dart';
+import 'package:tutder/config/RouteSingleton.dart';
 import 'package:tutder/domain/User.dart';
 import 'package:http/http.dart' as http;
 
 class UserPage extends StatefulWidget {
-  UserPage({
-    @required this.user,
-    @required this.pageVisibility,
-    @required this.me
-  });
+  UserPage(
+      {@required this.user,
+      @required this.pageVisibility,
+      @required this.me,
+      @required this.propagate,
+      @required this.idx});
 
   final Map user;
   final PageVisibility pageVisibility;
   final User me;
+  final Function(int, int) propagate;
+  final int idx;
 
   @override
   State createState() => new _UserPageState();
 }
 
 class _UserPageState extends State<UserPage> {
+  bool isLoved = false;
+  int loveCount = 0;
+
+  @override
+  void initState() {
+    super.initState();
+    setState(() {
+      isLoved = widget.user['extra']['is_loved'];
+      loveCount = widget.user['loved'];
+    });
+  }
+
   Widget _applyTextEffects({
     @required double translationFactor,
     @required Widget child,
@@ -43,45 +61,59 @@ class _UserPageState extends State<UserPage> {
 
   _love() async {
     http.Response response = await http.get(
-      API.USER_LIST_URL + widget.user['username'].toString(),
+      API.USER_LIST_URL + widget.user['username'].toString() + '/love',
       headers: new CombinedMapView([
         {'cookie': widget.me.session},
         API.DEFAULT_HEADER
       ]),
     );
+
+    Map<String, dynamic> body = json.decode(response.body);
+    if (body['code']['value'] == 200) {
+      widget.propagate(widget.idx, loveCount);
+
+      setState(() {
+        isLoved = true;
+        loveCount = body['content'];
+      });
+    } else {
+      // TODO
+    }
   }
 
   _buildLoved(BuildContext context) {
     final TextTheme textTheme = Theme.of(context).textTheme;
     final lovedCount = _applyTextEffects(
-      translationFactor: 100.0,
+      translationFactor: 30.0,
       child: new Padding(
         padding: const EdgeInsets.only(top: 16.0),
         child: new Text(
-          widget.user['loved'].toString(),
+          loveCount.toString(),
           style: textTheme.title
-              .copyWith(color: Colors.white, fontWeight: FontWeight.bold),
+              .copyWith(color: Colors.white, fontWeight: FontWeight.w100),
           textAlign: TextAlign.center,
         ),
       ),
     );
-    final heartButton = widget.user['extra']['is_loved']
+    final heartButton = isLoved
         ? new IconButton(
             icon: new Icon(Icons.favorite),
+            color: Colors.purple,
             onPressed: () {
               debugPrint('implement me');
             },
           )
         : new IconButton(
             icon: new Icon(Icons.favorite_border),
+            color: Colors.purple,
             onPressed: () {
               _love();
             },
           );
     return new Positioned(
-      bottom: 56.0,
-      left: 32.0,
-      right: 32.0,
+      bottom: 0.0,
+      //left: 32.0,
+      right: 0.0,
       child: new Column(
         mainAxisSize: MainAxisSize.min,
         children: [
@@ -142,7 +174,13 @@ class _UserPageState extends State<UserPage> {
           child: new Column(
             children: <Widget>[
               categoryText,
-              titleText
+              new GestureDetector(
+                child: titleText,
+                onHorizontalDragEnd: (e) {
+                  //.pushNamed(context, "/message/" + widget.user['username']);
+                  router.navigateTo(context, "/message/${widget.user['username']}", transition: TransitionType.inFromBottom);
+                },
+              )
             ],
           ),
         )
@@ -203,6 +241,7 @@ class _UserPageState extends State<UserPage> {
             frostedGlassFilter,
             imageOverlayGradient,
             _buildTextFooter(context),
+            _buildLoved(context),
           ],
         ),
       ),

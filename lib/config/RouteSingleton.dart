@@ -1,3 +1,5 @@
+import 'package:tutder/screens/MessagingScreen.dart';
+
 import '../screens/UserProfileSettingScreen.dart';
 import '../screens/UserFeedScreen.dart';
 import '../screens/LoginPage.dart';
@@ -18,11 +20,15 @@ class BaseRouterHandler {
   final _profileHandler = new Handler(
       handlerFunc: (_, Map<String, dynamic> params) => new UserProfileSettingScreen());
 
+  final _messagingHandler = new Handler(
+      handlerFunc: (_, Map<String, dynamic> params) => new MessagingScreen(params['username'][0].toString()));
+
   BaseRouterHandler() {
     router.define("/login", handler: _loginHandler);
     router.define("/home", handler: _homeHandler);
     router.define("/register", handler: _registerHandler);
     router.define("/profile", handler: _profileHandler);
+    router.define("/message/:username", handler: _messagingHandler);
   }
   BaseRouterHandler._internal();
 }

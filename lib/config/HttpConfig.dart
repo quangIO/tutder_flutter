@@ -12,9 +12,10 @@ class API {
   static const String REFRESH_URL = BASE_URL + '/secured/refresh';
   static const String IMAGE_CDN_URL = 'http://res.cloudinary.com/learnstuffinsideout/image/upload';
 
-  static const String USER_LIST_URL = BASE_URL + '/secured/user';
+  static const String USER_LIST_URL = BASE_URL + '/secured/user/';
   static const String USER_UPDATE_URL = BASE_URL + '/secured/user/update';
   static const String SKILL_URL_CREATE = BASE_URL + '/secured/skill/create';
+  static const String SKILL_VIEW_URL = BASE_URL + '/secured/skill/view/';
 
   static String getWebSocketUrl() =>
       'ws://' + BASE_URL.split("//")[1] + '/secured/ws';
