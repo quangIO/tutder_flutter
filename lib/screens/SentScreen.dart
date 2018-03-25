@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:convert';
 
 import 'package:collection/collection.dart';
@@ -20,6 +21,7 @@ class _SentState extends State<SentScreen> {
   User me;
 
   _load() async {
+    if(!mounted) return;
     me = await Login.getUserInfo();
     http.Response response = await http.get(
       API.BASE_URL + "/secured/message/sent",
@@ -35,10 +37,14 @@ class _SentState extends State<SentScreen> {
           items.add(new MessageItem(
             question: m['content'],
             place: m['place'],
+            idx: m['idx'],
           ));
         }
       });
     } else {}
+    new Future.delayed(const Duration(seconds: 3), () {
+      _load();
+    });
   }
 
   @override

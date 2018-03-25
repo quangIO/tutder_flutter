@@ -1,11 +1,14 @@
 import 'package:flutter/material.dart';
+import 'package:meta/meta.dart';
 import 'package:tutder/config/ThemeConfig.dart';
 
 
 class MessageItem extends StatelessWidget {
-  MessageItem({this.question, this.place});
+  MessageItem({this.question, this.place, this.isAccepted = false, @required this.idx});
 
   final String question, place;
+  final bool isAccepted;
+  final int idx;
 
   @override
   Widget build(BuildContext context) {
@@ -21,8 +24,8 @@ class MessageItem extends StatelessWidget {
       ),
       decoration: new BoxDecoration(
         shape: BoxShape.rectangle,
-        color: Colors.deepPurpleAccent.withOpacity(0.2),
-        borderRadius: new BorderRadius.circular(65.0),
+        color: (isAccepted) ? Colors.deepPurpleAccent.withOpacity(0.2) : Colors.brown.withOpacity(.2),
+        borderRadius: new BorderRadius.circular(5.0),
       ),
     );
   }

@@ -3,8 +3,9 @@ import 'package:flutter/material.dart';
 
 class DefaultDrawer extends StatelessWidget {
   final VoidCallback updateLocation;
+  final VoidCallback refresh;
 
-  DefaultDrawer({this.updateLocation});
+  DefaultDrawer({this.updateLocation, this.refresh});
 
   @override
   Widget build(BuildContext context) {
@@ -28,10 +29,15 @@ class DefaultDrawer extends StatelessWidget {
           ),
           new ListTile(
             leading: const Icon(Icons.send),
-            title: const Text('Requests'),
+            title: const Text('Sends'),
             onTap: () {
-              Navigator.pushNamed(context, '/sent');
+              Navigator.pushNamed(context, '/send');
             },
+          ),
+          new ListTile(
+            leading: const Icon(Icons.refresh),
+            title: const Text('Refresh'),
+            onTap: refresh,
           ),
           new Divider(),
           new ListTile(

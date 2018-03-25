@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:convert';
 
 import 'package:collection/collection.dart';
@@ -16,10 +17,11 @@ class RecievedScreen extends StatefulWidget {
 }
 
 class _RecievedState extends State<RecievedScreen> {
-  List<Widget> items = [];
+  List<MessageItem> items = [];
   User me;
 
   _load() async {
+    if (!mounted) return;
     me = await Login.getUserInfo();
     http.Response response = await http.get(
       API.BASE_URL + "/secured/message/request",
@@ -32,13 +34,20 @@ class _RecievedState extends State<RecievedScreen> {
     if (body['code']['value'] == 200) {
       setState(() {
         for (Map<String, dynamic> m in body['content']) {
-          items.add(new MessageItem(
-            question: m['content'],
-            place: m['place'],
-          ));
+          items.add(
+            new MessageItem(
+              question: m['content'],
+              place: m['place'],
+              isAccepted: m['isAccepted'],
+              idx: m['id'],
+            ),
+          );
         }
       });
     } else {}
+    new Future.delayed(const Duration(seconds: 3), () {
+      _load();
+    });
   }
 
   @override
@@ -65,6 +74,27 @@ class _RecievedState extends State<RecievedScreen> {
     );
   }
 
+  _accept(int idx) async {
+    http.Response response = await http.get(
+      API.BASE_URL + "/secured/message/${items[idx].idx}",
+      headers: new CombinedMapView([
+        {'cookie': me.session},
+        API.DEFAULT_HEADER
+      ]),
+    );
+    Map<String, dynamic> body = json.decode(response.body);
+    if (body['code']['value'] == 200) {
+      setState(() {
+        items[idx] = new MessageItem(
+          idx: items[idx].idx,
+          place: items[idx].place,
+          isAccepted: true,
+          question: items[idx].question,
+        );
+      });
+    } else {}
+  }
+
   @override
   Widget build(BuildContext context) {
     return new Scaffold(
@@ -76,7 +106,7 @@ class _RecievedState extends State<RecievedScreen> {
             automaticallyImplyLeading: true,
             expandedHeight: 350.0,
             backgroundColor: Colors.transparent,
-            title:             new Text(
+            title: new Text(
               "Altruistic Egoism",
               style: const TextStyle(
                 color: Colors.white,
@@ -98,7 +128,12 @@ class _RecievedState extends State<RecievedScreen> {
           new SliverList(
             delegate: new SliverChildBuilderDelegate(
               (BuildContext context, int index) {
-                return items[items.length - index - 1];
+                return new GestureDetector(
+                  child: items[index],
+                  onDoubleTap: () {
+                    _accept(index);
+                  },
+                );
               },
               childCount: items.length,
             ),
