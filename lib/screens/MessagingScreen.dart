@@ -98,13 +98,37 @@ class _MessagingState extends State<MessagingScreen> {
     );
   }
 
-  _send() {}
-
+  _send() async {
+    debugPrint("OK");
+    http.Response response = await http.post(
+      API.BASE_URL + '/secured/message/create',
+      headers: new CombinedMapView([
+        {'cookie': me.session},
+        API.DEFAULT_HEADER
+      ]),
+      body: json.encode({
+        'content': questionTextController.text,
+        'place': placeTextController.text,
+        'recipient': widget.username,
+      }),
+    );
+    Map<String, dynamic> body = json.decode(response.body);
+    if (body['code']['value'] == 200) {
+      Navigator.pop(context);
+    } else {
+      showBottomSheet(
+          context: context,
+          builder: (builder) {
+            return new Text("Error");
+          });
+    }
+    //questionTextController.clear();
+    //placeTextController.clear();
+  }
 
   @override
   void initState() {
     super.initState();
-    debugPrint(widget.username);
     _loadSkill();
   }
 
@@ -169,7 +193,7 @@ class _MessagingState extends State<MessagingScreen> {
                 return new FlatButton(
                   onPressed: null,
                   child: new Text(
-                    strengths[index].name,
+                    strengths[index]['name'],
                     style: TextStyles.infoContent,
                   ),
                 );
@@ -216,9 +240,8 @@ class _MessagingState extends State<MessagingScreen> {
       floatingActionButton: new FloatingActionButton(
         onPressed: () {
           _send();
-          Navigator.pushReplacementNamed(context, '/home');
         },
-        child: new Icon(Icons.arrow_right),
+        child: new Icon(Icons.message),
       ),
     );
   }

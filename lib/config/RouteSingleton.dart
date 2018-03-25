@@ -21,7 +21,9 @@ class BaseRouterHandler {
       handlerFunc: (_, Map<String, dynamic> params) => new UserProfileSettingScreen());
 
   final _messagingHandler = new Handler(
-      handlerFunc: (_, Map<String, dynamic> params) => new MessagingScreen(params['username'][0].toString()));
+      handlerFunc: (_, Map<String, dynamic> params) {
+        return new MessagingScreen(params['username'].toString().replaceFirst("[", "").replaceFirst("]", ""));
+      });
 
   BaseRouterHandler() {
     router.define("/login", handler: _loginHandler);
