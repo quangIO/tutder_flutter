@@ -74,6 +74,7 @@ class _UserFeedState extends State<UserFeedScreen> {
                     return UserPage(
                       user: item,
                       pageVisibility: pageVisibility,
+                      me: me,
                     );
                   },
                 );

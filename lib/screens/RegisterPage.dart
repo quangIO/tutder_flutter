@@ -20,8 +20,7 @@ class _RegisterPageState extends State<RegisterPage> {
   final TextEditingController _usernameController = new TextEditingController();
   final TextEditingController _emailController = new TextEditingController();
   final TextEditingController _passwordController = new TextEditingController();
-  final TextEditingController _passwordConfirmController =
-      new TextEditingController();
+  final TextEditingController _passwordConfirmController = new TextEditingController();
   Map errorMessages = {};
 
   _register(BuildContext ctx) async {
@@ -99,7 +98,7 @@ class _RegisterPageState extends State<RegisterPage> {
         mainAxisAlignment: MainAxisAlignment.center,
         children: <Widget>[
           new CustomFormTitle(
-            textContent: 'Stay with me. OK?',
+            textContent: 'Open Knowledge',
           ),
           new CustomTextField(
             controller: _usernameController,

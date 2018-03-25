@@ -1,27 +1,38 @@
 import 'dart:ui';
 
+import 'package:collection/collection.dart';
 import 'package:flutter/material.dart';
 import 'package:meta/meta.dart';
 import 'package:tutder/components/PageTransformer.dart';
-import 'package:tutder/domain//User.dart';
+import 'package:tutder/config/HttpConfig.dart';
+import 'package:tutder/domain/User.dart';
+import 'package:http/http.dart' as http;
 
-class UserPage extends StatelessWidget {
+class UserPage extends StatefulWidget {
   UserPage({
     @required this.user,
     @required this.pageVisibility,
+    @required this.me
   });
 
   final Map user;
   final PageVisibility pageVisibility;
+  final User me;
 
+  @override
+  State createState() => new _UserPageState();
+}
+
+class _UserPageState extends State<UserPage> {
   Widget _applyTextEffects({
     @required double translationFactor,
     @required Widget child,
   }) {
-    final double xTranslation = pageVisibility.pagePosition * translationFactor;
+    final double xTranslation =
+        widget.pageVisibility.pagePosition * translationFactor;
 
     return new Opacity(
-      opacity: pageVisibility.visibleFraction,
+      opacity: widget.pageVisibility.visibleFraction,
       child: new Transform(
         alignment: FractionalOffset.topLeft,
         transform: new Matrix4.translationValues(xTranslation, 0.0, 0.0),
@@ -30,12 +41,63 @@ class UserPage extends StatelessWidget {
     );
   }
 
+  _love() async {
+    http.Response response = await http.get(
+      API.USER_LIST_URL + widget.user['username'].toString(),
+      headers: new CombinedMapView([
+        {'cookie': widget.me.session},
+        API.DEFAULT_HEADER
+      ]),
+    );
+  }
+
+  _buildLoved(BuildContext context) {
+    final TextTheme textTheme = Theme.of(context).textTheme;
+    final lovedCount = _applyTextEffects(
+      translationFactor: 100.0,
+      child: new Padding(
+        padding: const EdgeInsets.only(top: 16.0),
+        child: new Text(
+          widget.user['loved'].toString(),
+          style: textTheme.title
+              .copyWith(color: Colors.white, fontWeight: FontWeight.bold),
+          textAlign: TextAlign.center,
+        ),
+      ),
+    );
+    final heartButton = widget.user['extra']['is_loved']
+        ? new IconButton(
+            icon: new Icon(Icons.favorite),
+            onPressed: () {
+              debugPrint('implement me');
+            },
+          )
+        : new IconButton(
+            icon: new Icon(Icons.favorite_border),
+            onPressed: () {
+              _love();
+            },
+          );
+    return new Positioned(
+      bottom: 56.0,
+      left: 32.0,
+      right: 32.0,
+      child: new Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          lovedCount,
+          heartButton,
+        ],
+      ),
+    );
+  }
+
   _buildTextFooter(BuildContext context) {
     final TextTheme textTheme = Theme.of(context).textTheme;
     final categoryText = _applyTextEffects(
-      translationFactor: 300.0,
+      translationFactor: 900.0,
       child: new Text(
-        user['info'],
+        widget.user['info'],
         style: textTheme.caption.copyWith(
           color: Colors.white70,
           fontWeight: FontWeight.bold,
@@ -51,7 +113,7 @@ class UserPage extends StatelessWidget {
       child: new Padding(
         padding: const EdgeInsets.only(top: 16.0),
         child: new Text(
-          user['username'],
+          widget.user['username'].toString().toUpperCase(),
           style: textTheme.title
               .copyWith(color: Colors.white, fontWeight: FontWeight.bold),
           textAlign: TextAlign.center,
@@ -59,6 +121,34 @@ class UserPage extends StatelessWidget {
       ),
     );
 
+    final description = _applyTextEffects(
+      translationFactor: 30.0,
+      child: new Padding(
+        padding: const EdgeInsets.symmetric(vertical: 32.0, horizontal: 14.0),
+        child: new Text(
+          widget.user['description'].toString(),
+          style: textTheme.title
+              .copyWith(color: Colors.white, fontWeight: FontWeight.w300),
+          textAlign: TextAlign.left,
+        ),
+      ),
+    );
+    return new Column(
+      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      children: <Widget>[
+        new Flexible(child: description),
+        new Container(
+          margin: new EdgeInsets.only(bottom: 18.0),
+          child: new Column(
+            children: <Widget>[
+              categoryText,
+              titleText
+            ],
+          ),
+        )
+      ],
+    );
+    /*
     return new Positioned(
       bottom: 56.0,
       left: 32.0,
@@ -71,16 +161,17 @@ class UserPage extends StatelessWidget {
         ],
       ),
     );
+    */
   }
 
   @override
   Widget build(BuildContext context) {
     // ignore: conflicting_dart_import
     final image = new Image.network(
-      user['imageUrl'],
+      widget.user['imageUrl'],
       fit: BoxFit.cover,
-      alignment:
-          new FractionalOffset(0.5 + (pageVisibility.pagePosition / 3), 0.5),
+      alignment: new FractionalOffset(
+          0.5 + (widget.pageVisibility.pagePosition / 3), 0.5),
     );
 
     final imageOverlayGradient = const DecoratedBox(
@@ -94,12 +185,11 @@ class UserPage extends StatelessWidget {
     );
 
     final frostedGlassFilter = new BackdropFilter(
-      filter: new ImageFilter.blur(sigmaX: 20.0, sigmaY: 20.0),
+      filter: new ImageFilter.blur(sigmaX: 5.0, sigmaY: 5.0),
       child: new Container(
         decoration: new BoxDecoration(color: Colors.grey[200].withOpacity(0.1)),
       ),
     );
-
 
     return new Padding(
       padding: const EdgeInsets.symmetric(vertical: 16.0, horizontal: 8.0),
